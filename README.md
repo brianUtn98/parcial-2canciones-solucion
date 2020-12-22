@@ -91,3 +91,77 @@ NO_LISTADA,
 ### Diagrama de entidad relación
 
 <img src="der2canciones.jpg">
+
+## Parte B - Interfaz REST
+
+### Perfil de usuario
+
+1. Consultar usuario
+```http
+get /usuario
+get /me
+```
+2. Editar usuario
+```http
+put /usuario
+put /me
+body:
+{
+nombre: "unNombre",
+apellido: "unApellido",
+email: "unEmail"
+}
+```
+
+### Reproductor de canciones
+
+1. Buscar canciones
+```http
+get /canciones/?cancion=unaCancion
+```
+2. Iniciar reproducción
+```http
+put /canciones/:id/reproducciones
+```
+3. Me gusta
+```http
+put /canciones/:id/like
+delete /canciones/:id/like
+```
+### Editor de listas de reproducción
+1. Visualizar playlist
+```http
+get /playlist/:id
+```
+2. Eliminar canciones
+```http
+delete /playlist/:id/canciones/:id
+```
+3. Guardar cambios
+```http
+patch /playlist/:id/canciones/:id
+body:
+{
+nombre: "unNombre",
+canciones: [
+            {
+            ...
+            },
+            ...
+           ]
+}
+```
+## Parte C - Arquitectura
+
+### Arquitectura 1
+<img src="arquitectura12canciones.png">
+
+Esta arquitectura no tiene ninguna tolerancia a fallos, se encuentra totalmente dentro de un servidor. Cada componente puede comportarse como un SPOF (base de datos, aplicación, servidor).
+Con respecto a escalabilidad, esta arquitectura solo puede escalar verticalmente, si lo hiciese de forma horizontal sería un cambio de arquitectura.
+
+### Arquitectura 2
+<img src="arquitectura22canciones.png">
+
+Esta arquitectura es más tolerable a errores que la anterior, pueden fallar hasta 2 servidores antes de que la aplicación deje de funcionar por completo. La Base de datos y el balanceador de cargas siguen siendo grandes SPOF.
+En cuanto a escalabilidad, se puede escalar tanto vertical como horizontalmente: Agregando más servidores o ampliando el hardware de cada servidor.
+Utilizando esta estrategia, se debe tener en cuenta que todos los servidores realizan consultas a una misma base de datos, por lo que se requiere pensar en alguna opción que maneje la concurrencia.
